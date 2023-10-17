@@ -1,9 +1,6 @@
 import pyfiglet
 
-col = [[] , [] , [] , [] , [] , [] , []]
-for i in range(7):
-    for j in col:
-        j.append(" ")
+col = [[" " for _ in range(7)] for _ in range(6)]
     
 
 def print_board():
@@ -16,7 +13,15 @@ def print_board():
             
             
 def take_input(current_turn):
-    pass
+     while True:
+        try:
+            x = int(input(f"Player {current_turn}: "))
+            if 0 < x < 8:
+                return x
+            else:
+                print("Please enter a number between 1 and 7")
+        except ValueError:
+            print("Invalid input. Please select an integer between 1 and 7")
 
 def check_win():
     pass
@@ -24,10 +29,33 @@ def check_win():
 
 def start_game():
     current_turn = 1 
+    sign = " "
     playgame = True
-    signs = ["X","O"]
     print_board()
-  
+    while playgame:
+        if current_turn == 1:
+            sign = "X"
+        else:
+            sign = "O"
+        index = take_input(current_turn) - 1
+        
+        # Check for available space in the chosen column
+        for r in range(6, 0, -1):
+            if col[r-1][index] == " ":
+                col[r-1][index] = sign
+                break
+        else:
+            # If the loop completes without a break, the column is full
+            print("This column is already full. Please choose another column.")
+            continue  # Go back to the start of the loop
+        
+        print_board()
+        
+        current_turn = 3 - current_turn
+        if check_win() is not None:
+            playgame = False
+
+        
     
     
     
