@@ -1,7 +1,9 @@
 import pyfiglet
 
-col = [[" " for _ in range(7)] for _ in range(6)]
-    
+def reset_board():
+    global col 
+    col = [[" " for _ in range(7)] for _ in range(6)]
+
 
 def print_board():
     for row in range(6):
@@ -10,8 +12,7 @@ def print_board():
         print()
     print()
             
-            
-            
+                  
 def take_input(current_turn):
      while True:
         try:
@@ -23,11 +24,46 @@ def take_input(current_turn):
         except ValueError:
             print("Invalid input. Please select an integer between 1 and 7")
 
-def check_win():
-    pass
+def check_win(current_turn , sign):
+    for row in range(6):
+        for col_start in range(4):
+            if (
+                col[row][col_start] == col[row][col_start + 1] == col[row][col_start + 2] == col[row][col_start + 3] == sign
+            ):
+                return f"Player {current_turn} wins!"
 
+    # Check for a win in columns
+    for col_index in range(7):
+        for row_start in range(3):
+            if (
+                col[row_start][col_index] == col[row_start + 1][col_index] == col[row_start + 2][col_index] == col[row_start + 3][col_index] == sign
+            ):
+                return f"Player {current_turn} wins!"
+
+    # Check for a win in diagonals (top-left to bottom-right)
+    for row_start in range(3):
+        for col_start in range(4):
+            if (
+                col[row_start][col_start] == col[row_start + 1][col_start + 1] == col[row_start + 2][col_start + 2] == col[row_start + 3][col_start + 3] == sign
+            ):
+                return f"Player {current_turn} wins!"
+
+    # Check for a win in diagonals (bottom-left to top-right)
+    for row_start in range(3, 6):
+        for col_start in range(4):
+            if (
+                col[row_start][col_start] == col[row_start - 1][col_start + 1] == col[row_start - 2][col_start + 2] == col[row_start - 3][col_start + 3] == sign
+            ):
+                return f"Player {current_turn} wins!"
+
+    # Check for a tie (board is full)
+    if all(col[row][col_index] != " " for row in range(6) for col_index in range(7)):
+        return "It's a tie!"
+
+    return None        
 
 def start_game():
+    reset_board()
     current_turn = 1 
     sign = " "
     playgame = True
@@ -47,20 +83,18 @@ def start_game():
         else:
             # If the loop completes without a break, the column is full
             print("This column is already full. Please choose another column.")
-            continue  # Go back to the start of the loop
+            continue  
         
         print_board()
-        
+        if check_win(current_turn , sign) is not None:
+            print(check_win(current_turn , sign))
+            play_again = input("Play again? Y/N:").lower()
+            if play_again == "y":
+                start_game()
+            else:
+                playgame = False
         current_turn = 3 - current_turn
-        if check_win() is not None:
-            playgame = False
-
         
-    
-    
-    
-
-    
 def display_menu():
     banner = pyfiglet.figlet_format("Connect 4" , font = "slant")
     print(banner)
@@ -103,7 +137,7 @@ while True:
     
     3. Inputs fill the gaps from bottom to top 
     
-    4. Player wins when 4 places in rows of columns filled.
+    4. Player wins when 4 places in rows of columns filled with the same sign.
 
     5. The game ends when a player wins or it's a tie (all spots are filled).
               ''')
